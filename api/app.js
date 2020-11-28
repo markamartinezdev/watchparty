@@ -4,8 +4,8 @@ import mongodb from "mongodb"
 import fs from "fs"
 
 import createDirectory from './create-directory.js'
-
-console.log(createDirectory('./assets'))
+console.log("scanning")
+console.log(createDirectory('F://Media/Anime/Batman - The Brave and The Bold/Season 1 (2008-09)'))
 
 dotenv.config()
 
@@ -83,12 +83,13 @@ app.get('/watch-party/:roomId', function(req, res) {
   });
 })
 
-app.get('/create-room', (reqest, response) => {
+app.get('/create-room/', (reqest, response) => {
   console.log("in room")
   MongoClient.connect(url, function(err, db) {
-    if (err) throw err;
+    const path = 'Media/Anime/Batman - The Brave and The Bold/Season 1 (2008-09)/Batman (T.B.A.T.B) - S01 E24 - The Fate Of Equinox (720p Web-DL).mp4'
+    if (err) throw err
     var dbo = db.db("watchparties")
-    var myobj = { key: "abc123", participants: 1 , maxParticipants : 10, filePath: "assets/movies/THE-SCENE-English.mov"}
+    var myobj = { key: "abc123", participants: 1 , maxParticipants : 10, filePath: "F:"+path}
 
     dbo.collection("room").insertOne(myobj, function(err, res) {
       if (err) throw err;
@@ -99,7 +100,10 @@ app.get('/create-room', (reqest, response) => {
       db.close()
     });
   });
-  
+})
+
+app.get('/', (req,res) => {
+  res.status('200').send('Why are you here?')
 })
 
 app.listen(Port, () => {
