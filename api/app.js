@@ -2,14 +2,20 @@ import dotenv from "dotenv"
 import express from "express"
 import mongodb from "mongodb"
 import fs from "fs"
-
+import ffmpeg from 'ffmpeg'
 import createDirectory from './create-directory.js'
-console.log("scanning")
-console.log(createDirectory('F://Media/Anime/Batman - The Brave and The Bold/Season 1 (2008-09)'))
+
 
 dotenv.config()
 
-let app = express()
+const app = express();
+
+app.use(express.json());
+
+
+console.log("scanning")
+const directory = createDirectory(process.env.DIRECTORY)
+console.log("scan complete")
 
 const Port = process.env.PORT || 3000
 
@@ -35,7 +41,11 @@ const generateKey = (length) => {
   return result;
 }
 
-app.get('/watch-party/:roomId', function(req, res) {
+app.get('/list', (req, res) => {
+  res.status('200').send(directory);
+})
+
+app.get('/watch/:roomId', (req, res) => {
   const roomId = req.params.roomId
 
   // Get file path
@@ -83,20 +93,40 @@ app.get('/watch-party/:roomId', function(req, res) {
   });
 })
 
-app.get('/create-room/', (reqest, response) => {
+app.get('/room/:roomId', (req, res) => {
+  const roomId = req.params.roomId
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db(process.env.DBNAME)
+    var query = { _id: ObjectID(roomId) }
+
+    dbo.collection("room").find(query).toArray(function(err, result) {
+      if (err) throw err
+
+      db.close()
+      res.status('200').send(result[0])
+    });
+  });
+})
+
+app.post('/create-room/', (request, response) => {
   console.log("in room")
   MongoClient.connect(url, function(err, db) {
-    const path = 'Media/Anime/Batman - The Brave and The Bold/Season 1 (2008-09)/Batman (T.B.A.T.B) - S01 E24 - The Fate Of Equinox (720p Web-DL).mp4'
+    const filePath = request.body.filePath
+    const fileName = request.body.name
+    const accessKey = generateKey(5)
     if (err) throw err
-    var dbo = db.db("watchparties")
-    var myobj = { key: "abc123", participants: 1 , maxParticipants : 10, filePath: "F:"+path}
+    var dbo = db.db(process.env.DBNAME)
+    var myobj = { key: accessKey, participants: 1 , maxParticipants : 10, createdAt: new Date(), fileName, filePath}
+    
+
+    dbo.collection("room").createIndex( { "createdAt": 1 }, { expireAfterSeconds: 20000 } )
 
     dbo.collection("room").insertOne(myobj, function(err, res) {
       if (err) throw err;
       console.log("1 document inserted")
-      const accessKey = generateKey(5)
       // create watch party
-      response.status('200').send(`${process.env.BASEURL}/watch-party/${res.insertedId} access key: ${accessKey.toUpperCase()}`)
+      response.status('200').send({link:res.insertedId, accessKey: accessKey.toUpperCase()})
       db.close()
     });
   });
