@@ -9,11 +9,9 @@ dotenv.config()
 const app = express()
 
 
-app.use(history({
-  index: '/dist/index.html'
-}));
+app.use(history());
 
-app.use(serveStatic("../client/dist"))
+app.use(express.static("../client/dist"))
 
 var port = process.env.PORT || 5000
 
