@@ -1,6 +1,6 @@
 module.exports = {
     devServer: {
-      proxy: 'https://pingadulce.com/'
+      proxy: 'https://pingadulce.com/',
     }
   }
   

@@ -110,9 +110,8 @@ app.get('/api/room/:roomId', (req, res) => {
       if (err) throw err
 
       db.close()
-      result[0] ?
-      res.status('200').send(result[0]) :
-      res.status('401').send({message:"room no longer exists"})
+      if (result[0]) res.status('200').send(result[0])
+      else res.status('401').send({message:"room no longer exists"})
     });
   });
 })

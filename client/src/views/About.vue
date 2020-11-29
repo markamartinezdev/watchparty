@@ -1,7 +1,7 @@
 <template>
   <div class="about">
     <h1>{{name}}</h1>
-    <video :showVideo="showVideo" controls>
+    <video v-if="showVideo" controls>
       <source :src="'/api/watch/'+this.id" type="video/mp4">
     </video>
   </div>
