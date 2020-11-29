@@ -10,8 +10,8 @@
         <p>{{item.name}}</p>
       </div>
     </section>
-    <section>
-      <h2>Files</h2>
+    <h2>Files</h2>
+    <section class="files">
       <p v-if="!fileList.length">no Files</p>
       <Video v-else v-for="video in fileList" :key="video.name" :video="video"/>
     </section>
@@ -72,11 +72,12 @@ li {
 a {
   color: #42b983;
 }
-.categories {
+.categories, .files {
   display: flex;
+  flex-wrap: wrap;
 }
 .category {
-  flex: 1;
+  flex: 1 0 400px;
   text-transform: capitalize;
   font-size: 30px;
   padding: 30px 20px;

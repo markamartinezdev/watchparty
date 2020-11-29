@@ -8,7 +8,10 @@ dotenv.config()
 
 const app = express()
 
-app.use(history())
+
+app.use(history({
+  index: '/dist/index.html'
+}));
 
 app.use(serveStatic("../client/dist"))
 
