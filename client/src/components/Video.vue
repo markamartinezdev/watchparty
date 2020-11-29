@@ -1,13 +1,14 @@
 <template>
-    <section>
+    <section class="video">
         <h2>{{video.name}}</h2>
         
-        <button @click="openRoom">open Room</button>
-
-        <div v-if="link.length">
-            <router-link :to="'/watch-party/'+link">{{baseURL}}watch-party/{{link}}</router-link>
-            <p>Accesskey: {{accessKey}}</p>
+        <div v-if="linkCreated">
+            <router-link class="video__room-link" :to="'/watch-party/'+link">{{baseURL}}watch-party/{{link}}</router-link>
+            <p class="video__room-data video__room-access-key">Accesskey: {{accessKey}}</p>
+            <p class="video__room-data">Room Id: {{link}}</p>
         </div>
+
+        <button class="btn" v-else @click="openRoom">open Room</button>
     </section>
 </template>
 
@@ -46,3 +47,32 @@ export default {
     }
 }
 </script>
+
+<style >
+.video {
+    max-width: 400px;
+    box-shadow: 0 0 9px 0 #919fd0;
+    padding: 16px;
+    background: #85c7ff;
+    border-radius: 10px;
+}
+.video__room-data {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.video__room-access-key {
+    font-size: 20px;
+    display: block;
+    background: white;
+    padding: 10px;
+}
+.video__room-link {
+    color: black;
+    background: white;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 17px;
+    display: inline-block;
+}
+</style>

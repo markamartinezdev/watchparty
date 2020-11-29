@@ -1,14 +1,20 @@
 <template>
-  <div class="hello">
-    <h1>{{ list.name }}</h1>
-  
-    <p v-for="(item, index) in list.children" :key="item.name" @click="dig(index)">{{item.name}}</p>
-
-    <div> 
+  <div class="directory">
+    <h1 class='title'>{{ list.name }}</h1>
+    <section class="categories">
+      <div
+        class="category"
+        v-for="(item, index) in categoryList"
+        :key="item.name"
+        @click="dig(index)">
+        <p>{{item.name}}</p>
+      </div>
+    </section>
+    <section>
       <h2>Files</h2>
-      <p v-if="!filteredList.length">no Files</p>
-      <Video v-else v-for="video in filteredList" :key="video.name" :video="video"/>
-    </div>
+      <p v-if="!fileList.length">no Files</p>
+      <Video v-else v-for="video in fileList" :key="video.name" :video="video"/>
+    </section>
   </div>
 </template>
 
@@ -40,8 +46,11 @@ export default {
     }
   },
   computed: {
-    filteredList() {
-      return this.list.children.filter(video => video.type == "file")
+    categoryList() {
+      return this.list.children.filter(item => item.type == "folder")
+    },
+    fileList() {
+      return this.list.children.filter(item => item.type == "file")
     }
   }
 }
@@ -62,5 +71,19 @@ li {
 }
 a {
   color: #42b983;
+}
+.categories {
+  display: flex;
+}
+.category {
+  flex: 1;
+  text-transform: capitalize;
+  font-size: 30px;
+  padding: 30px 20px;
+  border-radius: 10px;
+  box-shadow: 1px 4px 5px 0px #d0e7fb;
+  margin: 16px;
+  cursor: pointer;
+  background: linear-gradient(4deg, rgb(64 137 199 / 48%), transparent);
 }
 </style>
