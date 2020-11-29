@@ -33,7 +33,7 @@ export default {
     },
     methods: {
         openRoom() {
-            axios.post('/create-room', { filePath: this.video.path, name: this.video.name }).then(({data}) => {
+            axios.post('/create-room', { filePath: this.video.path, fileType: this.video.type, name: this.video.name }).then(({data}) => {
                 this.linkCreated = true
                 this.link = data.link
                 this.accessKey = data.accessKey

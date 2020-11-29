@@ -17,7 +17,9 @@ export default {
     return {
       link: '',
       accessKey: '',
-      list: {},
+      list: {
+        children: []
+      },
       message: ''
     }
   },

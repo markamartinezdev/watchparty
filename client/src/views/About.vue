@@ -2,7 +2,7 @@
   <div class="about">
     <h1>{{name}}</h1>
     <video controls>
-      <source :src="'/watch/'+this.id" type="video/mkv">
+      <source :src="'/watch/'+this.id" type="video/mp4">
     </video>
   </div>
 </template>
