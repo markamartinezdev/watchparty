@@ -54,47 +54,52 @@ app.get('/api/watch/:roomId', (req, res) => {
     var dbo = db.db(process.env.DBNAME)
     var query = { _id: ObjectID(roomId) }
 
-    dbo.collection("room").find(query).toArray(function(err, result) {
+    const collection = dbo.collection("room")
+
+    collection.find(query).toArray(function(err, result) {
       if (err) throw err
 
       if(result[0]) {
         const path = result[0].filePath
         const stat = fs.statSync(path)
-        const fileSize = stat.size
         const range = req.headers.range
 
-        db.close()
-
-        if (range) {
-          const parts = range.replace(/bytes=/, "").split("-")
-          const start = parseInt(parts[0], 10)
-          const end = parts[1] 
-            ? parseInt(parts[1], 10)
-            : fileSize-1
-          const chunksize = (end-start)+1
-          const file = fs.createReadStream(path, {start, end})
-          const head = {
-            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-            'Accept-Ranges': 'bytes',
-            'Content-Length': chunksize,
-            'Content-Type': 'video/mp4',
+        fs.stat(path, function(err, stats) {
+          if (err) {
+            if (err.code === 'ENOENT') {
+              // 404 Error if file not found
+              return res.sendStatus(404);
+            }
+          res.end(err);
           }
-          res.writeHead(206, head);
-          file.pipe(res)
-        }
-        else {
-          const head = {
-            'Content-Length': fileSize,
-            'Content-Type': 'video/mp4',
+          if (!range) {
+           // 416 Wrong range
+           return res.sendStatus(416);
           }
-          res.writeHead(200, head)
-          fs.createReadStream(path).pipe(res)
-        }
+          var positions = range.replace(/bytes=/, "").split("-");
+          var start = parseInt(positions[0], 10);
+          var total = stats.size;
+          var end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+          var chunksize = (end - start) + 1;
+    
+          res.writeHead(206, {
+            "Content-Range": "bytes " + start + "-" + end + "/" + total,
+            "Accept-Ranges": "bytes",
+            "Content-Length": chunksize,
+            "Content-Type": "video/mp4"
+          });
+    
+          var stream = fs.createReadStream(path, { start: start, end: end })
+            .on("open", function() {
+              stream.pipe(res);
+            }).on("error", function(err) {
+              res.end(err);
+            });
+        });
       }
       else {
         res.status('401').send({message:"room no longer exists"})
       }
-
     });
   });
 })
@@ -125,9 +130,18 @@ app.post('/api/create-room/', (request, response) => {
     const accessKey = generateKey(5)
     if (err) throw err
     var dbo = db.db(process.env.DBNAME)
-    var myobj = { key: accessKey, participants: 1 , maxParticipants : 10, createdAt: new Date(), fileName, filePath}
-    
 
+    var myobj = { 
+      key: accessKey,
+      participants: 1 ,
+      maxParticipants : 10,
+      createdAt: new Date(),
+      currentPosition: 0,
+      paused: false,
+      fileName,
+      filePath
+    }
+    
     dbo.collection("room").createIndex( { "createdAt": 1 }, { expireAfterSeconds: 20000 } )
 
     dbo.collection("room").insertOne(myobj, function(err, res) {
