@@ -41,11 +41,11 @@ const generateKey = (length) => {
   return result;
 }
 
-app.get('/list', (req, res) => {
+app.get('/api/list', (req, res) => {
   res.status('200').send(directory);
 })
 
-app.get('/watch/:roomId', (req, res) => {
+app.get('/api/watch/:roomId', (req, res) => {
   const roomId = req.params.roomId
 
   // Get file path
@@ -93,7 +93,7 @@ app.get('/watch/:roomId', (req, res) => {
   });
 })
 
-app.get('/room/:roomId', (req, res) => {
+app.get('/api/room/:roomId', (req, res) => {
   const roomId = req.params.roomId
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
@@ -109,7 +109,7 @@ app.get('/room/:roomId', (req, res) => {
   });
 })
 
-app.post('/create-room/', (request, response) => {
+app.post('/api/create-room/', (request, response) => {
   console.log("in room")
   MongoClient.connect(url, function(err, db) {
     const filePath = request.body.filePath
@@ -132,7 +132,7 @@ app.post('/create-room/', (request, response) => {
   });
 })
 
-app.get('/', (req,res) => {
+app.get('/api', (req,res) => {
   res.status('200').send('Why are you here?')
 })
 

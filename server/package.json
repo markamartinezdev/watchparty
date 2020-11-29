@@ -1,0 +1,16 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "serve-static": "^1.14.1",
+    "connect-history-api-fallback": "^1.6.0",
+    "dotenv": "^8.2.0"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  }
+}

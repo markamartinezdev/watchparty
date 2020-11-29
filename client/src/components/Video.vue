@@ -5,14 +5,14 @@
         <button @click="openRoom">open Room</button>
 
         <div v-if="link.length">
-            <router-link :to="'/watch-party/'+link">watch.pingadulce.com/{{link}}</router-link>
+            <router-link :to="'/watch-party/'+link">{{baseURL}}watch-party/{{link}}</router-link>
             <p>Accesskey: {{accessKey}}</p>
         </div>
     </section>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from '@/axios'
 export default {
     props: {
         video:{
@@ -24,16 +24,20 @@ export default {
             })
         }
     },
+    mounted() {
+        this.baseURL = process.env.VUE_APP_BASEURL
+    },
     data() {
         return {
             linkCreated: false,
             link: "",
-            accessKey: ""
+            accessKey: "",
+            baseURL: process.env.VUE_APP_BASEURL
         }
     },
     methods: {
         openRoom() {
-            axios.post('/create-room', { filePath: this.video.path, fileType: this.video.type, name: this.video.name }).then(({data}) => {
+            axios.post('api/create-room', { filePath: this.video.path, fileType: this.video.type, name: this.video.name }).then(({data}) => {
                 this.linkCreated = true
                 this.link = data.link
                 this.accessKey = data.accessKey

@@ -1,17 +1,40 @@
 <template>
   <div class="home">
-    <HelloWorld/>
+    <Directory :list="list" @dig="dig"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import Directory from '@/components/Directory'
+import axios from '@/axios'
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
-  }
+    Directory
+  },
+  data() {
+    return {
+      list: {
+        children: [],
+        name: ""
+      },
+    }
+  },
+  mounted() {
+    this.getList()
+  },
+  methods: {
+    dig(index) {
+      this.list = this.list.children[index]
+    },
+    getList() {
+      axios.get('api/list').then(({data}) => {
+        console.log(data)
+        this.list = data
+      })
+    },
+  },
 }
 </script>

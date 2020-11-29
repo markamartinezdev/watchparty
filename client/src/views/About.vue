@@ -2,12 +2,12 @@
   <div class="about">
     <h1>{{name}}</h1>
     <video controls>
-      <source :src="'/watch/'+this.id" type="video/mp4">
+      <source :src="'/api/watch/'+this.id" type="video/mp4">
     </video>
   </div>
 </template>
 <script>
-import axios from 'axios'
+import axios from '@/axios'
 export default {
   props: {
     id: {
@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     getStreamData() {
-      axios.get('/room/'+this.id).then(({ data }) => {
+      axios.get('/api/room/'+this.id).then(({ data }) => {
         console.log(data)
         this.name = data.fileName
       })

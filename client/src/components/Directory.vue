@@ -1,39 +1,43 @@
 <template>
   <div class="hello">
-    <h1>{{ message }}</h1>
+    <h1>{{ list.name }}</h1>
   
-    <Video v-for="video in filteredList" :key="video.name" :video="video"/>
+    <p v-for="(item, index) in list.children" :key="item.name" @click="dig(index)">{{item.name}}</p>
 
+    <div> 
+      <h2>Files</h2>
+      <p v-if="!filteredList.length">no Files</p>
+      <Video v-else v-for="video in filteredList" :key="video.name" :video="video"/>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import Video from "@/components/Video"
 export default {
-  name: 'HelloWorld',
+  name: 'Directory',
   components: { Video },
+  props: {
+    list: {
+      type: Object,
+      default: () => ({
+        children: [],
+        name: ""
+      })
+    }
+  },
   data() {
     return {
       link: '',
       accessKey: '',
-      list: {
-        children: []
-      },
       message: ''
     }
   },
-  mounted() {
-    this.getList()
-  },
   methods: {
-    getList() {
-      axios.get('/list').then(({data}) => {
-        console.log(data)
-        this.list = data
-        this.message = data.name
-      })
-    },
+    dig(index) {
+      this.$emit('dig', index)
+      console.log(index)
+    }
   },
   computed: {
     filteredList() {
