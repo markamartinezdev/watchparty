@@ -1,7 +1,7 @@
 <template>
   <div class="about">
     <h1>{{name}}</h1>
-    <video controls>
+    <video :showVideo="showVideo" controls>
       <source :src="'/api/watch/'+this.id" type="video/mp4">
     </video>
   </div>
@@ -17,7 +17,8 @@ export default {
   },
   data() {
     return {
-      name: "",
+      name: "joining the watch party",
+      showVideo: false
     }
   },
   mounted() {
@@ -28,6 +29,7 @@ export default {
       axios.get('/api/room/'+this.id).then(({ data }) => {
         console.log(data)
         this.name = data.fileName
+        this.showVideo = true
       })
     },
   }
