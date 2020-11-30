@@ -2,15 +2,34 @@ import dotenv from "dotenv"
 import express from "express"
 import mongodb from "mongodb"
 import fs from "fs"
-import ffmpeg from 'ffmpeg'
+import Ffmpeg from 'fluent-ffmpeg'
 import createDirectory from './create-directory.js'
-
 
 dotenv.config()
 
 const app = express();
 
 app.use(express.json());
+
+Ffmpeg.getAvailableFormats(function(err, formats) {
+  console.log('Available formats:');
+  console.dir(formats);
+});
+
+Ffmpeg.getAvailableCodecs(function(err, codecs) {
+  console.log('Available codecs:');
+  console.dir(codecs);
+});
+
+Ffmpeg.getAvailableEncoders(function(err, encoders) {
+  console.log('Available encoders:');
+  console.dir(encoders);
+});
+
+Ffmpeg.getAvailableFilters(function(err, filters) {
+  console.log("Available filters:");
+  console.dir(filters);
+});
 
 
 console.log("scanning")
