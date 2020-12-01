@@ -1,14 +1,15 @@
 <template>
   <div class="about">
     <h1 class="">{{name}}</h1>
-    <video v-if="showVideo" controls>
-      <source :src="'/api/watch/'+this.id" type="video/mp4">
-    </video>
+    <VideoPlayer v-if="showVideo" :options="videoOptions"/>
   </div>
 </template>
 <script>
 import axios from '@/axios'
+import VideoPlayer from "@/components/VideoPlayer"
+
 export default {
+  components: { VideoPlayer },
   props: {
     id: {
       type: String,
@@ -18,11 +19,24 @@ export default {
   data() {
     return {
       name: "joining the watch party",
-      showVideo: false
+      showVideo: false,
+      videoOptions: {}
     }
   },
   mounted() {
     this.getStreamData()
+    this.videoOptions = {
+      autoplay: true,
+      controls: true,
+      sources: [
+        {
+          src:"/api/watch/"+this.id,
+          type: "video/mp4"
+        }
+      ],
+      techOrder: ['flash', 'html5']
+    }
+
   },
   methods: {
     async getStreamData() {

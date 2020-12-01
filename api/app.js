@@ -2,34 +2,43 @@ import dotenv from "dotenv"
 import express from "express"
 import mongodb from "mongodb"
 import fs from "fs"
+import path from 'path'
 import Ffmpeg from 'fluent-ffmpeg'
 import createDirectory from './create-directory.js'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 dotenv.config()
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json())
 
-Ffmpeg.getAvailableFormats(function(err, formats) {
-  console.log('Available formats:');
-  console.dir(formats);
-});
+app.set('view engine', 'html');
 
-Ffmpeg.getAvailableCodecs(function(err, codecs) {
-  console.log('Available codecs:');
-  console.dir(codecs);
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
-Ffmpeg.getAvailableEncoders(function(err, encoders) {
-  console.log('Available encoders:');
-  console.dir(encoders);
-});
+// Ffmpeg.getAvailableFormats(function(err, formats) {
+//   console.log('Available formats:');
+//   console.dir(formats);
+// });
 
-Ffmpeg.getAvailableFilters(function(err, filters) {
-  console.log("Available filters:");
-  console.dir(filters);
-});
+// Ffmpeg.getAvailableCodecs(function(err, codecs) {
+//   console.log('Available codecs:');
+//   console.dir(codecs);
+// });
+
+// Ffmpeg.getAvailableEncoders(function(err, encoders) {
+//   console.log('Available encoders:');
+//   console.dir(encoders);
+// });
+
+// Ffmpeg.getAvailableFilters(function(err, filters) {
+//   console.log("Available filters:");
+//   console.dir(filters);
+// });
 
 
 console.log("scanning")
@@ -80,41 +89,19 @@ app.get('/api/watch/:roomId', (req, res) => {
 
       if(result[0]) {
         const path = result[0].filePath
-        const stat = fs.statSync(path)
-        const range = req.headers.range
-
-        fs.stat(path, function(err, stats) {
-          if (err) {
-            if (err.code === 'ENOENT') {
-              // 404 Error if file not found
-              return res.sendStatus(404);
-            }
-          res.end(err);
-          }
-          if (!range) {
-           // 416 Wrong range
-           return res.sendStatus(416);
-          }
-          var positions = range.replace(/bytes=/, "").split("-");
-          var start = parseInt(positions[0], 10);
-          var total = stats.size;
-          var end = positions[1] ? parseInt(positions[1], 10) : total - 1;
-          var chunksize = (end - start) + 1;
-    
-          res.writeHead(206, {
-            "Content-Range": "bytes " + start + "-" + end + "/" + total,
-            "Accept-Ranges": "bytes",
-            "Content-Length": chunksize,
-            "Content-Type": "video/mp4"
-          });
-    
-          var stream = fs.createReadStream(path, { start: start, end: end })
-            .on("open", function() {
-              stream.pipe(res);
-            }).on("error", function(err) {
-              res.end(err);
-            });
-        });
+        res.contentType('flv');
+        var proc = Ffmpeg(path)
+          // use the 'flashvideo' preset (located in /lib/presets/flashvideo.js)
+          .preset('flashvideo')
+          // setup event handlers
+          .on('end', function() {
+            console.log('file has been converted succesfully');
+          })
+          .on('error', function(err) {
+            console.log('an error happened: ' + err.message);
+          })
+          // save to stream
+          .pipe(res, {end:true});
       }
       else {
         res.status('401').send({message:"room no longer exists"})
@@ -175,6 +162,30 @@ app.post('/api/create-room/', (request, response) => {
 app.get('/api', (req,res) => {
   res.status('200').send('Why are you here?')
 })
+
+app.get('/api/test', (req,res) => {
+  res.sendFile((path.join(__dirname, './index.html')))
+})
+
+app.get('/api/video', function(req, res) {
+
+  res.contentType('flv');
+  // make sure you set the correct path to your video file storage
+  var pathToMovie = process.env.DIRECTORY + process.env.TESTPATH;
+  console.log(pathToMovie)
+  var proc = Ffmpeg(pathToMovie)
+    // use the 'flashvideo' preset (located in /lib/presets/flashvideo.js)
+    .preset('flashvideo')
+    // setup event handlers
+    .on('end', function() {
+      console.log('file has been converted succesfully');
+    })
+    .on('error', function(err) {
+      console.log('an error happened: ' + err.message);
+    })
+    // save to stream
+    .pipe(res, {end:true});
+});
 
 app.listen(Port, () => {
   console.log("Api started on port: ", Port)
