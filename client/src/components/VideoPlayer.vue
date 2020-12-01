@@ -6,8 +6,6 @@
 
 <script>
 import videojs from 'video.js';
-import videojsFlash from 'videojs-flash'
-
 
 export default {
     name: "VideoPlayer",
@@ -23,10 +21,6 @@ export default {
         return {
             player: null
         }
-    },
-
-    methods:{
-        ...videojsFlash
     },
     mounted() {
         this.player = videojs(this.$refs.videoPlayer, this.options, function onPlayerReady() {

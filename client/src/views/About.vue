@@ -34,7 +34,6 @@ export default {
           type: "video/mp4"
         }
       ],
-      techOrder: ['flash', 'html5']
     }
 
   },

@@ -1,7 +1,5 @@
 import dotenv from "dotenv"
-import { dirname } from 'path';
 import express from "express"
-import serveStatic from "serve-static"
 import history from "connect-history-api-fallback"
 
 dotenv.config()
