@@ -32,6 +32,18 @@ export default {
         {
           src:"/api/watch/"+this.id,
           type: "video/mp4"
+        },
+        {
+          src:"/api/watch/"+this.id,
+          type: "video/mkv"
+        },
+        {
+          src:"/api/watch/"+this.id,
+          type: "video/mov"
+        },
+        {
+          src:"/api/watch/"+this.id,
+          type: "video/mpg"
         }
       ],
     }
