@@ -7,7 +7,6 @@ import routes from './routes/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-
 const app = express();
 
 app.use(express.json())
