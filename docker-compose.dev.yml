@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+      mongo:
+            image: mongo:4.2.8
+            
+      pinga-party-be:
+            build: ./api/
+            environment:
+                  - DB_URL=mongodb://mongo:27017/watchparties
+                  - PORT=9002
+                  - BASEURL=http://localhost:9002
+                  - DIRECTORY=F://Media/
+                  - DBNAME=watchparties
+                  - TESTPATH=/THE-SCENE-English.mov
+                  - FFMPEG_PATH=../ffmpeg/bin/ffmpeg.exe
+                  - FFPROBE_PATH=../ffmpeg/bin/ffprobe.exe
+            links: 
+                  - mongo
+            depends_on: 
+                  - mongo
+            ports: 
+                  - 9002:9002
+            volumes: 
+                  - F://Media/
+                  - ./ffmpeg/
+
+      pinga-party-fe:
+            build: ./client/
+            links:
+                  - pinga-party-be
+            depends_on:
+                  - pinga-party-be
+            ports: 
+                  - 9003:9003
+            volumes: 
+                  - ./client/node_modueles/
+
+volumes:
+      mongodb:
+      mongodb_config:

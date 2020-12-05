@@ -1,6 +1,7 @@
 module.exports = {
     devServer: {
-      proxy: 'http://localhost:9001',
+      proxy: process.env.VUE_APP_BASEURL,
+      port: 9003
     }
   }
   
